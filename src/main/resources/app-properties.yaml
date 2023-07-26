@@ -1,0 +1,7 @@
+google:
+  spreadsheet:
+    id: YOUR_SPREADSHEET_ID
+  credentials:
+    path: path/to/credentials.json
+  application:
+    name: YOUR_APPLICATION_NAME
