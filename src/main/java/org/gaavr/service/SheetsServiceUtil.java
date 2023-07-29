@@ -29,9 +29,6 @@ public class SheetsServiceUtil {
                     .build();
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
-            System.out.println("!!!!!!!!!!!!!!!");
-            System.out.println("Тут упали");
-            System.out.println("!!!!!!!!!!!!!!!");
             return null;
         }
     }
