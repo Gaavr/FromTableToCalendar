@@ -21,14 +21,15 @@ public class SheetsController {
     public void readDataFromSheets() {
         String spreadsheetId = googleConfig.getSpreadsheetId();
         String range = "Sheet1!A1:C";
-        List<List<Object>> data = googleSheetsReader.readData(spreadsheetId, range);
+        List<List<String>> data = googleSheetsReader.readData(spreadsheetId, range);
 
         // Выводим данные в консоль
-        for (List<Object> row : data) {
-            for (Object cell : row) {
+        for (List<String> row : data) {
+            for (String cell : row) {
                 System.out.print(cell + "\t");
             }
             System.out.println();
         }
     }
+
 }

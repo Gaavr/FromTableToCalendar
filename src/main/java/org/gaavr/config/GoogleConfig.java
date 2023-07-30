@@ -20,4 +20,10 @@ public class GoogleConfig {
 
     @Value("${google.application.name}")
     private String applicationName;
+
+    @Value("${google.client.id}")
+    private String clientId;
+
+    @Value("${google.client.secret}")
+    private String clientSecret;
 }
