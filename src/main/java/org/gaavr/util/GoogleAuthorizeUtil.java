@@ -1,4 +1,4 @@
-package org.gaavr.google;
+package org.gaavr.util;
 
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.Credential;
@@ -15,6 +15,8 @@ import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import lombok.RequiredArgsConstructor;
+import org.gaavr.config.GoogleConfig;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,46 +27,37 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class GoogleAuthorizeUtil {
 
+    private final GoogleConfig googleConfig;
     private final JsonFactory JSON_FACTORY = Utils.getDefaultJsonFactory();
-    private final String APPLICATION_NAME = "fromtabletocalendar";
-    private final String CREDENTIALS_FILE_PATH = "/credentials/google-sheet-credentials.json";
     private final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 
     public Credential authorize() throws IOException, GeneralSecurityException {
-        // Загружаем файл credentials.json из ресурсов вашего проекта
-        InputStream in = GoogleAuthorizeUtil.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream in = GoogleAuthorizeUtil.class.getResourceAsStream(googleConfig.getCredentialsPath());
         if (in == null) {
-            throw new NullPointerException("Файл credentials.json не найден в ресурсах проекта!");
+            throw new NullPointerException("credentials.json not found");
         }
 
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-        // Подготавливаем данные для авторизации
         HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
         DataStoreFactory dataStoreFactory = new FileDataStoreFactory(new java.io.File("tokens"));
-
-        // Создаем объект GoogleAuthorizationCodeFlow
         AuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(dataStoreFactory)
                 .setAccessType("offline")
                 .build();
 
-        // Получаем учетные данные пользователя
-        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-
-        return credential;
+        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
     }
 
     public Sheets getSheetsService() throws IOException, GeneralSecurityException {
         Credential credential = authorize();
         return new Sheets.Builder(GoogleNetHttpTransport.newTrustedTransport(),
                 JacksonFactory.getDefaultInstance(), credential)
-                .setApplicationName(APPLICATION_NAME)
+                .setApplicationName(googleConfig.getApplicationName())
                 .build();
     }
-
 }
 
