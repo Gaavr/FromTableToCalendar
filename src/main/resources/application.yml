@@ -1,7 +1,9 @@
 google:
   spreadsheet:
-    id: YOUR_SPREADSHEET_ID
+    id: 1x4eIUP9KHrvk8v2EwhADoeMxH-CyLc312l5PoI8dcqI
   credentials:
-    path: path/to/credentials.json
+    path: /credentials/google-sheet-credentials.json
   application:
-    name: YOUR_APPLICATION_NAME
+    name: fromtabletocalendar
+  calendar:
+    id: 72e01db5c10ce861a42aca28ac25824eaa5f76f5a59cd8886f3ce3b5aca66631

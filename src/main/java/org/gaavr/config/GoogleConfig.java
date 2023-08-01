@@ -20,4 +20,7 @@ public class GoogleConfig {
 
     @Value("${google.application.name}")
     private String applicationName;
+
+    @Value("${google.calendar.id}")
+    private String calendarId;
 }

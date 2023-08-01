@@ -12,11 +12,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/sheets")
 @RequiredArgsConstructor
-public class SheetsController {
+public class GoogleSheetsController {
 
     private final GoogleSheetsReaderService googleSheetsReaderService;
     private final GoogleConfig googleConfig;
 
+    //todo добавить параметры диапазано в контроллер
     @GetMapping("/data")
     public List<List<Object>> getDataFromSheets() {
         String spreadsheetId = googleConfig.getSpreadsheetId();

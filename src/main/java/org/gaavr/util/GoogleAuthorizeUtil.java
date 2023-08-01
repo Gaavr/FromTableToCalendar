@@ -13,6 +13,8 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.calendar.Calendar;
+import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +35,10 @@ public class GoogleAuthorizeUtil {
 
     private final GoogleConfig googleConfig;
     private final JsonFactory JSON_FACTORY = Utils.getDefaultJsonFactory();
-    private final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
+    private final List<String> SCOPES = Arrays.asList(
+            SheetsScopes.SPREADSHEETS,
+            CalendarScopes.CALENDAR_EVENTS
+    );
 
     public Credential authorize() throws IOException, GeneralSecurityException {
         InputStream in = GoogleAuthorizeUtil.class.getResourceAsStream(googleConfig.getCredentialsPath());
@@ -56,6 +62,14 @@ public class GoogleAuthorizeUtil {
         Credential credential = authorize();
         return new Sheets.Builder(GoogleNetHttpTransport.newTrustedTransport(),
                 JacksonFactory.getDefaultInstance(), credential)
+                .setApplicationName(googleConfig.getApplicationName())
+                .build();
+    }
+
+    public Calendar getCalendarService() throws IOException, GeneralSecurityException {
+        Credential credential = authorize();
+
+        return new Calendar.Builder(GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, credential)
                 .setApplicationName(googleConfig.getApplicationName())
                 .build();
     }
