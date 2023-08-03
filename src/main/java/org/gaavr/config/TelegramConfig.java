@@ -15,4 +15,7 @@ public class TelegramConfig {
 
     @Value("${telegram.token}")
     private String token;
+
+    @Value("${telegram.ownerChat.id}")
+    private String ownerChatId;
 }

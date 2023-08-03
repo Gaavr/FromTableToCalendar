@@ -34,4 +34,10 @@ public class TelegramBotController {
             e.printStackTrace();
         }
     }
+
+    @PostMapping("/send-text-message")
+    public void sendTextMessage(@RequestBody String message) {
+        telegramBotService.sendTextMessage(message);
+    }
+
 }

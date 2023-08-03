@@ -8,34 +8,44 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class TelegramBotService extends TelegramLongPollingBot {
 
     private final TelegramConfig telegramConfig;
+    private String lastChatId;
 
     @Override
     public void onUpdateReceived(Update update) {
         // Обработка полученного обновления (сообщения от пользователя, команды и т.д.)
-        // Здесь вы можете реализовать логику вашего бота
-        try {
-            // Пример ответа на сообщение пользователя
-            execute(new SendMessage(update.getMessage().getChatId().toString(), "Привет, я ваш бот!"));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
+        if (update.hasMessage()) {
+            lastChatId = update.getMessage().getChatId().toString();
+            try {
+                // Пример ответа на сообщение пользователя
+                execute(new SendMessage(lastChatId, "Привет, я ваш бот! Скоро все заработает!"));
+            } catch (TelegramApiException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     @Override
-    public String getBotUsername() {
-        // Укажите имя вашего бота (выбранное вами при создании бота в BotFather)
-        return telegramConfig.getName();
-    }
+    public String getBotUsername() { return telegramConfig.getName(); }
 
     @Override
-    public String getBotToken() {
-        // Укажите токен вашего бота (полученный от BotFather)
-        return telegramConfig.getToken();
+    public String getBotToken() { return telegramConfig.getToken(); }
+
+    public void sendTextMessage(String message) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(telegramConfig.getOwnerChatId());
+        sendMessage.setText(message);
+
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 }
-
