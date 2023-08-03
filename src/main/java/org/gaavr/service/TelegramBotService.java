@@ -1,5 +1,7 @@
 package org.gaavr.service;
 
+import lombok.RequiredArgsConstructor;
+import org.gaavr.config.TelegramConfig;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -7,7 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 @Component
+@RequiredArgsConstructor
 public class TelegramBotService extends TelegramLongPollingBot {
+
+    private final TelegramConfig telegramConfig;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -24,13 +29,13 @@ public class TelegramBotService extends TelegramLongPollingBot {
     @Override
     public String getBotUsername() {
         // Укажите имя вашего бота (выбранное вами при создании бота в BotFather)
-        return "your_bot_name";
+        return telegramConfig.getName();
     }
 
     @Override
     public String getBotToken() {
         // Укажите токен вашего бота (полученный от BotFather)
-        return "your_bot_token";
+        return telegramConfig.getToken();
     }
 }
 
