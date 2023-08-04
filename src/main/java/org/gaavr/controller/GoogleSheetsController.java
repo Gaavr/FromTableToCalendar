@@ -5,8 +5,11 @@ import org.gaavr.config.GoogleConfig;
 import org.gaavr.service.GoogleSheetsReaderService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 @RestController
@@ -23,5 +26,10 @@ public class GoogleSheetsController {
         String spreadsheetId = googleConfig.getSpreadsheetId();
         String range = "УБВТ21!A478:B478"; // Замените на нужный диапазон данных
         return googleSheetsReaderService.readData(spreadsheetId, range);
+    }
+
+    @GetMapping("/events")
+    public List<List<Object>> getListOfEvents() throws IOException, GeneralSecurityException {
+        return googleSheetsReaderService.getListOfEvents();
     }
 }
