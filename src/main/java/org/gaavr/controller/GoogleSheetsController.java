@@ -2,6 +2,7 @@ package org.gaavr.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.gaavr.config.GoogleConfig;
+import org.gaavr.model.EventDTO;
 import org.gaavr.service.GoogleSheetsReaderService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ public class GoogleSheetsController {
     }
 
     @GetMapping("/events")
-    public List<List<Object>> getListOfEvents() throws IOException, GeneralSecurityException {
+    public List<EventDTO> getListOfEvents() throws IOException, GeneralSecurityException, InterruptedException {
         return googleSheetsReaderService.getListOfEvents();
     }
 }

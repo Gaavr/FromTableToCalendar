@@ -15,6 +15,9 @@ public class GoogleConfig {
     @Value("${google.spreadsheet.id}")
     private String spreadsheetId;
 
+    @Value("${google.spreadsheet.mainList}")
+    private String mainList;
+
     @Value("${google.credentials.path}")
     private String credentialsPath;
 
