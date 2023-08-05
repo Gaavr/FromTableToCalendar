@@ -2,9 +2,12 @@ package org.gaavr.controller;
 
 import com.google.api.services.calendar.model.Event;
 import lombok.RequiredArgsConstructor;
+import org.gaavr.model.EventDTO;
 import org.gaavr.service.GoogleCalendarService;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 @RestController
@@ -22,5 +25,17 @@ public class GoogleCalendarController {
     @PostMapping("/events")
     public Event createEvent(@RequestBody Event event) {
         return googleCalendarService.createEvent(event);
+    }
+
+    @PostMapping("/create-events")
+    public String createEvents(@RequestBody List<EventDTO> eventDTOList) throws GeneralSecurityException, IOException, InterruptedException {
+        googleCalendarService.createEventsFromDTO(eventDTOList);
+        return "События успешно созданы!";
+    }
+
+    @PostMapping("/create-events-without-your-date")
+    public String createEvents() throws GeneralSecurityException, IOException, InterruptedException {
+        googleCalendarService.createEventsFromDTO();
+        return "События успешно созданы!";
     }
 }

@@ -64,7 +64,7 @@ public class GoogleSheetsReaderService {
             System.out.println("No data found.");
         } else {
             for (List<Object> row : values) {
-                if (row.size() < 3) continue; // Если в строке меньше 3 элементов, пропускаем ее
+                if (row.size() < 3) continue; // If the string has less than 3 elements, skip it
 
                 // RegEx validation
                 if (row.size() > 3 && row.get(3).toString().matches(namePattern)) {
