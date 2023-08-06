@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -93,40 +95,48 @@ public class GoogleCalendarService {
         }
     }
 
-    public void createEventsFromDTO()  {
-        try {
-            Calendar calendarService = googleAuthorizeUtil.getCalendarService();
+    public void createEventsFromDTO() throws GeneralSecurityException, IOException, InterruptedException {
+        List<EventDTO> eventDTOList = googleSheetsReaderService.getListOfEvents();
 
-            for (EventDTO eventDTO : googleSheetsReaderService.getListOfEvents()) {
-                Event event = new Event()
-                        .setSummary(eventDTO.getSubject())
-                        .setDescription("Преподаватель: " + eventDTO.getTeacher());
+        Calendar calendarService = googleAuthorizeUtil.getCalendarService();
+        String previousDate = null;
 
-                String dateStr = eventDTO.getDate();
-                String[] dateParts = dateStr.split(" ");
-                String startDateStr = dateParts[0];
-                String startTimeStr = dateParts[1].split("-")[0];
-                String endTimeStr = dateParts[1].split("-")[1];
+        for (EventDTO eventDTO : eventDTOList) {
+            Event event = new Event()
+                    .setSummary(eventDTO.getSubject())
+                    .setDescription("Преподаватель: " + eventDTO.getTeacher());
 
-                DateTime startDateTime = new DateTime(startDateStr + "T" + startTimeStr + ":00+03:00"); // Время в вашем часовом поясе
-                EventDateTime start = new EventDateTime()
-                        .setDateTime(startDateTime)
-                        .setTimeZone("Europe/Moscow"); // Установите ваш часовой пояс
-                event.setStart(start);
+            String dateStr = eventDTO.getDate();
+            String[] dateParts = dateStr.split(" ");
+            String startDateStr = dateParts[0];
+            String startTimeStr = dateParts[1].split("-")[0].replace('.', ':');
+            String endTimeStr = dateParts[1].split("-")[1].replace('.', ':');
 
-                DateTime endDateTime = new DateTime(startDateStr + "T" + endTimeStr + ":00+03:00");
-                EventDateTime end = new EventDateTime()
-                        .setDateTime(endDateTime)
-                        .setTimeZone("Europe/Moscow");
-                event.setEnd(end);
-
-                String calendarId = googleConfig.getCalendarId(); // ID календаря, в который добавляются события
-                calendarService.events().insert(calendarId, event).execute();
+            if (!startDateStr.contains(".")) {
+                startDateStr = previousDate;
+            } else {
+                previousDate = startDateStr;
+                String[] dateElements = startDateStr.split("\\.");
+                startDateStr = dateElements[2] + "-" + dateElements[1] + "-" + dateElements[0];
             }
 
-            System.out.println("События созданы успешно.");
-        } catch (IOException | GeneralSecurityException | InterruptedException e) {
-            e.printStackTrace();
+            DateTime startDateTime = new DateTime(startDateStr + "T" + startTimeStr + ":00+03:00");
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDateTime)
+                    .setTimeZone("Europe/Moscow");
+            event.setStart(start);
+
+            DateTime endDateTime = new DateTime(startDateStr + "T" + endTimeStr + ":00+03:00");
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDateTime)
+                    .setTimeZone("Europe/Moscow");
+            event.setEnd(end);
+
+            String calendarId = googleConfig.getCalendarId();
+            calendarService.events().insert(calendarId, event).execute();
         }
+
+        System.out.println("События созданы успешно.");
     }
+
 }
