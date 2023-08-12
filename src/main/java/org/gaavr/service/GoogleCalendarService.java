@@ -13,10 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -97,16 +96,27 @@ public class GoogleCalendarService {
 
     public void createEventsFromDTO() throws GeneralSecurityException, IOException, InterruptedException {
         List<EventDTO> eventDTOList = googleSheetsReaderService.getListOfEvents();
+        Pattern datePattern = Pattern.compile("^\\d{2}\\.\\d{2}\\.\\d{4} \\d{2}\\.\\d{2}-\\d{2}\\.\\d{2}$");
 
         Calendar calendarService = googleAuthorizeUtil.getCalendarService();
         String previousDate = null;
 
         for (EventDTO eventDTO : eventDTOList) {
+            System.out.println(eventDTO.getDate());
+        }
+
+        for (EventDTO eventDTO : eventDTOList) {
+            String dateStr = eventDTO.getDate();
+
+            if (!datePattern.matcher(dateStr).matches()) {
+                System.out.println("Неверный формат даты: " + dateStr);
+                continue;
+            }
+
             Event event = new Event()
                     .setSummary(eventDTO.getSubject())
                     .setDescription("Преподаватель: " + eventDTO.getTeacher());
 
-            String dateStr = eventDTO.getDate();
             String[] dateParts = dateStr.split(" ");
             String startDateStr = dateParts[0];
             String startTimeStr = dateParts[1].split("-")[0].replace('.', ':');
@@ -138,5 +148,6 @@ public class GoogleCalendarService {
 
         System.out.println("События созданы успешно.");
     }
+
 
 }
