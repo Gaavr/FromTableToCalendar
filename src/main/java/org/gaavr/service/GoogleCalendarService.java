@@ -149,5 +149,18 @@ public class GoogleCalendarService {
         System.out.println("События созданы успешно.");
     }
 
+    public void deleteAllEvents() {
+        try {
+            Calendar calendarService = googleAuthorizeUtil.getCalendarService();
+            String calendarId = googleConfig.getCalendarId();
+
+            Events events = calendarService.events().list(calendarId).execute();
+            for (Event event : events.getItems()) {
+                calendarService.events().delete(calendarId, event.getId()).execute();
+            }
+        } catch (IOException | GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

@@ -38,4 +38,14 @@ public class GoogleCalendarController {
         googleCalendarService.createEventsFromDTO();
         return "События успешно созданы!";
     }
+
+    @PostMapping("/delete-all-events")
+    public String deleteAllEvents() {
+        try {
+            googleCalendarService.deleteAllEvents();
+            return "Все события успешно удалены.";
+        } catch (Exception e) {
+            return "Ошибка при удалении событий: " + e.getMessage();
+        }
+    }
 }
