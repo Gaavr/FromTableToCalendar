@@ -33,10 +33,16 @@ public class GoogleCalendarController {
         return "События успешно созданы!";
     }
 
-    @PostMapping("/create-events-without-your-data")
-    public String createEvents() throws GeneralSecurityException, IOException, InterruptedException {
-        googleCalendarService.createEventsFromDTO();
-        return "События успешно созданы!";
+    @PostMapping("/create-events-from-sheet")
+    public String createEvents() {
+        try {
+            googleCalendarService.createEventsFromDTO();
+            return "События успешно созданы!";
+        } catch (GeneralSecurityException | IOException | InterruptedException e) {
+            return e.getMessage();
+        }
+
+
     }
 
     @PostMapping("/delete-all-events")

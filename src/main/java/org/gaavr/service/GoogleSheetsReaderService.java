@@ -50,47 +50,47 @@ public class GoogleSheetsReaderService {
         List<List<Object>> values = response.getValues();
         List<EventDTO> result = new ArrayList<>();
 
+        String datePattern = "[0-9]{2}.[0-9]{2}.[0-9]{4}г?\\.";
         String timePattern = "[0-9]{2}.[0-9]{2}-[0-9]{2}.[0-9]{2}";
-        String datePattern = "[0-9]{2}.[0-9]{2}.[0-9]{4}";
-        String subjectPattern = "^[А-Яа-я].*";
-        String namePattern = "[А-Я][а-я]*\\s[А-Я].\\s?[А-Я].?";
 
-        String date = "";
-        String time = "";
+        String dateTime = "";
         String subject = "";
-        String teacher = "";
 
         if (values == null || values.isEmpty()) {
             System.out.println("No data found.");
         } else {
             for (List<Object> row : values) {
-                if (row.size() < 3) continue; // If the string has less than 3 elements, skip it
+                if (row.size() < 2) {
+                    continue;
+                }
 
-                // RegEx validation
-                if (row.size() > 3 && row.get(3).toString().matches(namePattern)) {
-                    teacher = row.get(3).toString();
-                    EventDTO event = new EventDTO(date + " " + time, subject, teacher);
-                    // Only add the event if it does not exist in the result list
-                    if (!result.contains(event)) {
-                        result.add(event);
-                    }
-                    // Reset date, time and subject for next round
-                    date = "";
-                    time = "";
-                    subject = "";
-                } else {
-                    if (row.get(0).toString().matches(datePattern)) {
-                        date = row.get(0).toString();
-                    }
-                    if (row.get(1).toString().matches(timePattern)) {
-                        time = row.get(1).toString();
-                    }
-                    if (row.get(2).toString().matches(subjectPattern)) {
+                if (row.get(0).toString().matches(datePattern)) {
+                    dateTime = row.get(0).toString() + " " + row.get(1).toString();
+                    if (row.size() > 2) {
                         subject = row.get(2).toString();
                     }
+
+                    if(!dateTime.isEmpty() && !subject.isEmpty()) {
+                        result.add(new EventDTO(dateTime, subject, "Преподаватель"));
+                        // Reset variables for the next iteration
+                        dateTime = "";
+                        subject = "";
+                    }
+                } else {
+//                    System.out.println("Invalid date row: " + (values.indexOf(row) + 1)); // Printing the row number of the invalid date
                 }
             }
         }
+
+        // Вывод результатов
+        for (EventDTO dto : result) {
+            System.out.println("---------------");
+            System.out.println(dto.getDate());
+            System.out.println(dto.getSubject());
+            System.out.println(dto.getTeacher());
+        }
+
         return result;
     }
+
 }

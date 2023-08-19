@@ -101,6 +101,8 @@ public class GoogleCalendarService {
         Calendar calendarService = googleAuthorizeUtil.getCalendarService();
         String previousDate = null;
 
+        // Этот блок выводит даты для проверки.
+        // Если не нужно, его можно удалить
         for (EventDTO eventDTO : eventDTOList) {
             System.out.println(eventDTO.getDate());
         }
@@ -115,7 +117,7 @@ public class GoogleCalendarService {
 
             Event event = new Event()
                     .setSummary(eventDTO.getSubject())
-                    .setDescription("Преподаватель: " + eventDTO.getTeacher());
+                    .setDescription("Преподаватель: " + eventDTO.getTeacher()); // Вернул поле преподавателя
 
             String[] dateParts = dateStr.split(" ");
             String startDateStr = dateParts[0];
@@ -148,6 +150,7 @@ public class GoogleCalendarService {
 
         System.out.println("События созданы успешно.");
     }
+
 
     public void deleteAllEvents() {
         try {
