@@ -81,15 +81,6 @@ public class GoogleSheetsReaderService {
                 }
             }
         }
-
-        // Вывод результатов
-        for (EventDTO dto : result) {
-            System.out.println("---------------");
-            System.out.println(dto.getDate());
-            System.out.println(dto.getSubject());
-            System.out.println(dto.getTeacher());
-        }
-
         return result;
     }
 

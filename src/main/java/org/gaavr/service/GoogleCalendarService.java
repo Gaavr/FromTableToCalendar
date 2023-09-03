@@ -143,24 +143,6 @@ public class GoogleCalendarService {
         }
     }
 
-//    public void deleteAllEvents() {
-//        try {
-//            Calendar calendarService = googleAuthorizeUtil.getCalendarService();
-//            String calendarId = googleConfig.getCalendarId();
-//
-//            Events events = calendarService.events().list(calendarId).execute();
-//            System.out.println("size of events list: " + events.size());
-//            for (Event event : events.getItems()) {
-//                System.out.println(" inside if");
-//                calendarService.events().delete(calendarId, event.getId()).execute();
-//            }
-//        } catch (IOException e) {
-//            System.out.println(" inside catch");
-//            e.printStackTrace();
-//        }
-//    }
-
-
     public void createEventsFromDTO() throws GeneralSecurityException, IOException, InterruptedException {
         List<EventDTO> eventDTOList = googleSheetsReaderService.getListOfEvents();
         Pattern datePattern = Pattern.compile("^\\d{2}\\.\\d{2}\\.\\d{4}г? \\d{2}\\.\\d{2}-\\d{2}\\.\\d{2}$");
