@@ -65,12 +65,17 @@ public class GoogleAuthorizeUtil {
                 .build();
     }
 
-    public Calendar getCalendarService() throws IOException, GeneralSecurityException {
-        Credential credential = authorize();
+    public Calendar getCalendarService() {
+        try {
+            Credential credential = authorize();
 
-        return new Calendar.Builder(GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, credential)
-                .setApplicationName(googleConfig.getApplicationName())
-                .build();
+            return new Calendar.Builder(GoogleNetHttpTransport.newTrustedTransport(), JSON_FACTORY, credential)
+                    .setApplicationName(googleConfig.getApplicationName())
+                    .build();
+        } catch (IOException | GeneralSecurityException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
 

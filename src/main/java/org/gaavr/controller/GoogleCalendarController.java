@@ -45,7 +45,7 @@ public class GoogleCalendarController {
 
     }
 
-    @PostMapping("/delete-all-events")
+    @DeleteMapping("/delete-all-events")
     public String deleteAllEvents() {
         try {
             googleCalendarService.deleteAllEvents();

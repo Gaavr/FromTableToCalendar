@@ -25,7 +25,8 @@ public class GoogleSheetsController {
     @GetMapping("/data")
     public List<List<Object>> getDataFromSheets() {
         String spreadsheetId = googleConfig.getSpreadsheetId();
-        String range = "УБВТ21!A478:B478"; // Замените на нужный диапазон данных
+//        String range = "УБВТ21!A478:B478";
+        String range = "УБВТ21-2!A213:B213";
         return googleSheetsReaderService.readData(spreadsheetId, range);
     }
 

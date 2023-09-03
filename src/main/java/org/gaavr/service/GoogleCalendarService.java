@@ -2,9 +2,7 @@ package org.gaavr.service;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
-import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventDateTime;
-import com.google.api.services.calendar.model.Events;
+import com.google.api.services.calendar.model.*;
 import lombok.RequiredArgsConstructor;
 import org.gaavr.config.GoogleConfig;
 import org.gaavr.model.EventDTO;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -26,17 +25,47 @@ public class GoogleCalendarService {
     private final GoogleSheetsReaderService googleSheetsReaderService;
 
 
+//    public List<Event> getEvents() {
+//        try {
+//            Calendar calendarService = googleAuthorizeUtil.getCalendarService();
+//
+//            Events events = calendarService.events().list(googleConfig.getCalendarId())
+//                    .setOrderBy("startTime")
+//                    .setSingleEvents(true)
+//                    .execute();
+//
+//            System.out.println(events.size());
+//            System.out.println(events.getAccessRole());
+//            return events.getItems();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return Collections.emptyList();
+//        }
+//    }
+
     public List<Event> getEvents() {
         try {
+            String calendarId = googleConfig.getCalendarId();
             Calendar calendarService = googleAuthorizeUtil.getCalendarService();
 
-            Events events = calendarService.events().list(googleConfig.getCalendarId())
-                    .setOrderBy("startTime")
-                    .setSingleEvents(true)
-                    .execute();
+            List<Event> allEvents = new ArrayList<>();
+            String nextPageToken = null;
 
-            return events.getItems();
-        } catch (IOException | GeneralSecurityException e) {
+            do {
+                Events events = calendarService.events().list(calendarId)
+                        .setPageToken(nextPageToken)
+                        .execute();
+
+                List<Event> pageEvents = events.getItems();
+                if (pageEvents != null) {
+                    allEvents.addAll(pageEvents);
+                }
+
+                nextPageToken = events.getNextPageToken();
+            } while (nextPageToken != null);
+
+            return allEvents;
+        } catch (IOException e) {
             e.printStackTrace();
             return Collections.emptyList();
         }
@@ -48,7 +77,7 @@ public class GoogleCalendarService {
 
             String calendarId = "primary";
             return calendarService.events().insert(calendarId, event).execute();
-        } catch (IOException | GeneralSecurityException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
@@ -66,7 +95,7 @@ public class GoogleCalendarService {
                         .setSummary(eventDTO.getSubject())
                         .setDescription("Преподаватель: " + eventDTO.getTeacher());
 
-                String dateStr = eventDTO.getDate();
+                String dateStr = eventDTO.getDate().replace("г.", "").trim();
                 String[] dateParts = dateStr.split(" ");
                 String startDateStr = dateParts[0];
                 String startTimeStr = dateParts[1].split("-")[0];
@@ -89,40 +118,77 @@ public class GoogleCalendarService {
             }
 
             System.out.println("События созданы успешно.");
-        } catch (IOException | GeneralSecurityException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public void deleteAllEvents() {
+        try {
+            String calendarId = googleConfig.getCalendarId();
+            Calendar calendarService = googleAuthorizeUtil.getCalendarService();
+
+            List<Event> eventsToDelete = getEvents();
+
+            for (Event event : eventsToDelete) {
+                System.out.println("Попытка удалить событие " + event.getSummary());
+                calendarService.events().delete(calendarId, event.getId()).execute();
+                System.out.println("Событие " + event.getSummary() + " удалено!");
+            }
+
+            System.out.println("Все события удалены из календаря с calendarId: " + calendarId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Не удалось удалить события из календаря" );
+        }
+    }
+
+//    public void deleteAllEvents() {
+//        try {
+//            Calendar calendarService = googleAuthorizeUtil.getCalendarService();
+//            String calendarId = googleConfig.getCalendarId();
+//
+//            Events events = calendarService.events().list(calendarId).execute();
+//            System.out.println("size of events list: " + events.size());
+//            for (Event event : events.getItems()) {
+//                System.out.println(" inside if");
+//                calendarService.events().delete(calendarId, event.getId()).execute();
+//            }
+//        } catch (IOException e) {
+//            System.out.println(" inside catch");
+//            e.printStackTrace();
+//        }
+//    }
+
+
     public void createEventsFromDTO() throws GeneralSecurityException, IOException, InterruptedException {
         List<EventDTO> eventDTOList = googleSheetsReaderService.getListOfEvents();
-        Pattern datePattern = Pattern.compile("^\\d{2}\\.\\d{2}\\.\\d{4} \\d{2}\\.\\d{2}-\\d{2}\\.\\d{2}$");
+        Pattern datePattern = Pattern.compile("^\\d{2}\\.\\d{2}\\.\\d{4}г? \\d{2}\\.\\d{2}-\\d{2}\\.\\d{2}$");
 
         Calendar calendarService = googleAuthorizeUtil.getCalendarService();
         String previousDate = null;
-
-        // Этот блок выводит даты для проверки.
-        // Если не нужно, его можно удалить
-        for (EventDTO eventDTO : eventDTOList) {
-            System.out.println(eventDTO.getDate());
-        }
+        int eventsCreated = 0;
+        List<String> notCreatedEvents = new ArrayList<>();
 
         for (EventDTO eventDTO : eventDTOList) {
-            String dateStr = eventDTO.getDate();
+            String dateStr = eventDTO.getDate().replace("г.", "").trim();
 
             if (!datePattern.matcher(dateStr).matches()) {
                 System.out.println("Неверный формат даты: " + dateStr);
+                notCreatedEvents.add(eventDTO.getSubject());  // Добавляем событие в список не созданных
                 continue;
             }
 
             Event event = new Event()
                     .setSummary(eventDTO.getSubject())
-                    .setDescription("Преподаватель: " + eventDTO.getTeacher()); // Вернул поле преподавателя
+                    .setDescription("Преподаватель: " + eventDTO.getTeacher());
 
             String[] dateParts = dateStr.split(" ");
             String startDateStr = dateParts[0];
             String startTimeStr = dateParts[1].split("-")[0].replace('.', ':');
             String endTimeStr = dateParts[1].split("-")[1].replace('.', ':');
+            //                String startTimeStr = "19:00";
+//                String endTimeStr = "22:00";
 
             if (!startDateStr.contains(".")) {
                 startDateStr = previousDate;
@@ -146,24 +212,23 @@ public class GoogleCalendarService {
 
             String calendarId = googleConfig.getCalendarId();
             calendarService.events().insert(calendarId, event).execute();
+
+            System.out.println("Создано событие: " + eventDTO.getSubject());
+            eventsCreated++;
         }
 
-        System.out.println("События созданы успешно.");
-    }
+        if (eventsCreated > 0) {
+            System.out.println("Успешно создано событий: " + eventsCreated);
+        } else {
+            System.out.println("События не были созданы.");
+        }
 
-
-    public void deleteAllEvents() {
-        try {
-            Calendar calendarService = googleAuthorizeUtil.getCalendarService();
-            String calendarId = googleConfig.getCalendarId();
-
-            Events events = calendarService.events().list(calendarId).execute();
-            for (Event event : events.getItems()) {
-                calendarService.events().delete(calendarId, event.getId()).execute();
+        // Выводим названия не созданных событий
+        if (!notCreatedEvents.isEmpty()) {
+            System.out.println("Не созданные события:");
+            for (String eventName : notCreatedEvents) {
+                System.out.println(eventName);
             }
-        } catch (IOException | GeneralSecurityException e) {
-            e.printStackTrace();
         }
     }
-
 }

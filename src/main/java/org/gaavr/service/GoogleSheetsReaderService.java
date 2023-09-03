@@ -50,7 +50,7 @@ public class GoogleSheetsReaderService {
         List<List<Object>> values = response.getValues();
         List<EventDTO> result = new ArrayList<>();
 
-        String datePattern = "[0-9]{2}.[0-9]{2}.[0-9]{4}г?\\.";
+        String datePattern = "[0-9]{2}.[0-9]{2}.[0-9]{4}(г\\.)?( \\([а-яА-Я]+\\))?";
         String timePattern = "[0-9]{2}.[0-9]{2}-[0-9]{2}.[0-9]{2}";
 
         String dateTime = "";
@@ -65,7 +65,7 @@ public class GoogleSheetsReaderService {
                 }
 
                 if (row.get(0).toString().matches(datePattern)) {
-                    dateTime = row.get(0).toString() + " " + row.get(1).toString();
+                    dateTime = row.get(0).toString().replaceFirst("(г\\.)?( \\([а-яА-Я]+\\))?", "") + " " + row.get(1).toString(); // очистим дату от лишних символов
                     if (row.size() > 2) {
                         subject = row.get(2).toString();
                     }
@@ -77,7 +77,7 @@ public class GoogleSheetsReaderService {
                         subject = "";
                     }
                 } else {
-//                    System.out.println("Invalid date row: " + (values.indexOf(row) + 1)); // Printing the row number of the invalid date
+//                System.out.println("Invalid date row: " + (values.indexOf(row) + 1)); // Printing the row number of the invalid date
                 }
             }
         }
@@ -92,5 +92,6 @@ public class GoogleSheetsReaderService {
 
         return result;
     }
+
 
 }
