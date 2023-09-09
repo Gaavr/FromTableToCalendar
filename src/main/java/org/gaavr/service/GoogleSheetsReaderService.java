@@ -22,7 +22,6 @@ public class GoogleSheetsReaderService {
     private final GoogleConfig googleConfig;
     private final Constants constants;
 
-    //example
     public List<List<Object>> readData(String spreadsheetId, String range) {
         try {
             Sheets sheetsService = googleAuthorizeUtil.getSheetsService();
@@ -72,17 +71,13 @@ public class GoogleSheetsReaderService {
 
                     if(!dateTime.isEmpty() && !subject.isEmpty()) {
                         result.add(new EventDTO(dateTime, subject, "Преподаватель"));
-                        // Reset variables for the next iteration
                         dateTime = "";
                         subject = "";
                     }
-                } else {
-//                System.out.println("Invalid date row: " + (values.indexOf(row) + 1)); // Printing the row number of the invalid date
                 }
             }
         }
         return result;
     }
-
 
 }

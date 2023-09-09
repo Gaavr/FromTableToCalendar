@@ -30,14 +30,14 @@ public class GoogleCalendarController {
     @PostMapping("/create-events")
     public String createEvents(@RequestBody List<EventDTO> eventDTOList) throws GeneralSecurityException, IOException, InterruptedException {
         googleCalendarService.createEventsFromDTO(eventDTOList);
-        return "События успешно созданы!";
+        return "Events have been created";
     }
 
     @PostMapping("/create-events-from-sheet")
     public String createEvents() {
         try {
             googleCalendarService.createEventsFromDTO();
-            return "События успешно созданы!";
+            return "Events have been created";
         } catch (GeneralSecurityException | IOException | InterruptedException e) {
             return e.getMessage();
         }
@@ -49,9 +49,9 @@ public class GoogleCalendarController {
     public String deleteAllEvents() {
         try {
             googleCalendarService.deleteAllEvents();
-            return "Все события успешно удалены.";
+            return "Events have been deleted";
         } catch (Exception e) {
-            return "Ошибка при удалении событий: " + e.getMessage();
+            return "Error deleting events: " + e.getMessage();
         }
     }
 }

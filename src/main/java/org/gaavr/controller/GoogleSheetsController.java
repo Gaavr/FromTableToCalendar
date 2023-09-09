@@ -21,11 +21,9 @@ public class GoogleSheetsController {
     private final GoogleSheetsReaderService googleSheetsReaderService;
     private final GoogleConfig googleConfig;
 
-    //todo добавить параметры диапазано в контроллер
     @GetMapping("/data")
     public List<List<Object>> getDataFromSheets() {
         String spreadsheetId = googleConfig.getSpreadsheetId();
-//        String range = "УБВТ21!A478:B478";
         String range = "УБВТ21-2!A213:B213";
         return googleSheetsReaderService.readData(spreadsheetId, range);
     }

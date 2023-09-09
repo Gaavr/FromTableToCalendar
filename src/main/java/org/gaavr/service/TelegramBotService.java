@@ -74,16 +74,16 @@ public class TelegramBotService extends TelegramLongPollingBot {
 
         List<KeyboardRow> keyboard = new ArrayList<>();
 
-        KeyboardRow keyboardRow1 = new KeyboardRow();
-        keyboardRow1.add("Посмотреть все в календаре");
-        keyboardRow1.add("Посмотреть все в таблице");
+        KeyboardRow showKeyboardRow = new KeyboardRow();
+        showKeyboardRow.add("Посмотреть все в календаре");
+        showKeyboardRow.add("Посмотреть все в таблице");
 
-        KeyboardRow keyboardRow2 = new KeyboardRow();
-        keyboardRow2.add("Добавить все в календарь");
-        keyboardRow2.add("Удалить все из календаря");
+        KeyboardRow actionKeyboardRow = new KeyboardRow();
+        actionKeyboardRow.add("Добавить все в календарь");
+        actionKeyboardRow.add("Удалить все из календаря");
 
-        keyboard.add(keyboardRow1);
-        keyboard.add(keyboardRow2);
+        keyboard.add(showKeyboardRow);
+        keyboard.add(actionKeyboardRow);
 
         keyboardMarkup.setKeyboard(keyboard);
 

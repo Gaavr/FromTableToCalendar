@@ -24,25 +24,6 @@ public class GoogleCalendarService {
     private final GoogleConfig googleConfig;
     private final GoogleSheetsReaderService googleSheetsReaderService;
 
-
-//    public List<Event> getEvents() {
-//        try {
-//            Calendar calendarService = googleAuthorizeUtil.getCalendarService();
-//
-//            Events events = calendarService.events().list(googleConfig.getCalendarId())
-//                    .setOrderBy("startTime")
-//                    .setSingleEvents(true)
-//                    .execute();
-//
-//            System.out.println(events.size());
-//            System.out.println(events.getAccessRole());
-//            return events.getItems();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return Collections.emptyList();
-//        }
-//    }
-
     public List<Event> getEvents() {
         try {
             String calendarId = googleConfig.getCalendarId();
@@ -117,7 +98,7 @@ public class GoogleCalendarService {
                 calendarService.events().insert(calendarId, event).execute();
             }
 
-            System.out.println("События созданы успешно.");
+            System.out.println("Events have been created");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -131,15 +112,15 @@ public class GoogleCalendarService {
             List<Event> eventsToDelete = getEvents();
 
             for (Event event : eventsToDelete) {
-                System.out.println("Попытка удалить событие " + event.getSummary());
+                System.out.println("Attempt to delete an event " + event.getSummary());
                 calendarService.events().delete(calendarId, event.getId()).execute();
-                System.out.println("Событие " + event.getSummary() + " удалено!");
+                System.out.println("Event " + event.getSummary() + " deleted");
             }
 
-            System.out.println("Все события удалены из календаря с calendarId: " + calendarId);
+            System.out.println("All events are removed from the calendar with с calendarId: " + calendarId);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Не удалось удалить события из календаря" );
+            System.out.println("Couldn't delete events from calendar" );
         }
     }
 
@@ -156,7 +137,7 @@ public class GoogleCalendarService {
             String dateStr = eventDTO.getDate().replace("г.", "").trim();
 
             if (!datePattern.matcher(dateStr).matches()) {
-                System.out.println("Неверный формат даты: " + dateStr);
+                System.out.println("Invalid date format: " + dateStr);
                 notCreatedEvents.add(eventDTO.getSubject());  // Добавляем событие в список не созданных
                 continue;
             }
@@ -195,19 +176,18 @@ public class GoogleCalendarService {
             String calendarId = googleConfig.getCalendarId();
             calendarService.events().insert(calendarId, event).execute();
 
-            System.out.println("Создано событие: " + eventDTO.getSubject());
+            System.out.println("Event created: " + eventDTO.getSubject());
             eventsCreated++;
         }
 
         if (eventsCreated > 0) {
-            System.out.println("Успешно создано событий: " + eventsCreated);
+            System.out.println("Successfully created events: " + eventsCreated);
         } else {
-            System.out.println("События не были созданы.");
+            System.out.println("Events were not created");
         }
 
-        // Выводим названия не созданных событий
         if (!notCreatedEvents.isEmpty()) {
-            System.out.println("Не созданные события:");
+            System.out.println("Events not created:");
             for (String eventName : notCreatedEvents) {
                 System.out.println(eventName);
             }
