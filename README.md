@@ -55,8 +55,3 @@ By automating these tasks, the application saves time, reduces scheduling errors
 ## Author
 
 https://www.linkedin.com/in/andrey--gavrilenko/
-gavrjob@gmail.com
-https://t.me/gaavr
-
-[Specify your name and contact information]
-
