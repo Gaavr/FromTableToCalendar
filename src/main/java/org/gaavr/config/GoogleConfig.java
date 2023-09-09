@@ -1,17 +1,29 @@
 package org.gaavr.config;
 
 import lombok.Getter;
-import lombok.Value;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
+@ConfigurationProperties("google")
 @Getter
-@ConfigurationProperties(prefix = "google")
+@Setter
 public class GoogleConfig {
 
+    @Value("${google.spreadsheet.id}")
     private String spreadsheetId;
+
+    @Value("${google.spreadsheet.mainList}")
+    private String mainList;
+
+    @Value("${google.credentials.path}")
     private String credentialsPath;
+
+    @Value("${google.application.name}")
     private String applicationName;
 
+    @Value("${google.calendar.id}")
+    private String calendarId;
 }

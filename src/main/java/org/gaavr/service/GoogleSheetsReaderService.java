@@ -1,42 +1,83 @@
 package org.gaavr.service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import org.gaavr.config.Constants;
+import org.gaavr.config.GoogleConfig;
+import org.gaavr.model.EventDTO;
+import org.gaavr.util.GoogleAuthorizeUtil;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Component
+@RequiredArgsConstructor
 public class GoogleSheetsReaderService {
 
-    private static final String SPREADSHEET_ID = "YOUR_SPREADSHEET_ID";
-    private static final String APPLICATION_NAME = "YOUR_APPLICATION_NAME";
-    private final Resource credentialsResource;
+    private final GoogleAuthorizeUtil googleAuthorizeUtil;
+    private final GoogleConfig googleConfig;
+    private final Constants constants;
 
-    public GoogleSheetsReaderService(@Value("${google.credentials.path}") Resource credentialsResource) {
-        this.credentialsResource = credentialsResource;
+    public List<List<Object>> readData(String spreadsheetId, String range) {
+        try {
+            Sheets sheetsService = googleAuthorizeUtil.getSheetsService();
+
+            ValueRange response = sheetsService.spreadsheets().values()
+                    .get(spreadsheetId, range)
+                    .execute();
+
+            return response.getValues();
+        } catch (IOException | GeneralSecurityException e) {
+            System.out.println("Error getting data from table " + e.getCause());
+        }
+        return null;
     }
 
-    public List<List<Object>> readDataFromGoogleSheets(String range) throws IOException {
-        // Загрузите учетные данные из файла credentials.json
-        GoogleCredential credentials = GoogleCredential.fromStream(credentialsResource.getInputStream())
-                .createScoped(Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY));
+    public List<EventDTO> getListOfEvents() throws GeneralSecurityException, IOException, InterruptedException {
+        String spreadsheetId = googleConfig.getSpreadsheetId();
+        String range = googleConfig.getMainList() + "!" + constants.getWholeRange();
 
-        // Создайте экземпляр Google Sheets Service
-        Sheets sheetsService = new Sheets.Builder(credentials.getTransport(), credentials.getJsonFactory(), credentials)
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+        Sheets service = googleAuthorizeUtil.getSheetsService();
+        ValueRange response = service.spreadsheets().values()
+                .get(spreadsheetId, range)
+                .execute();
 
-        // Чтение данных из Google Таблицы
-        ValueRange response = sheetsService.spreadsheets().values().get(SPREADSHEET_ID, range).execute();
-        return response.getValues();
+        List<List<Object>> values = response.getValues();
+        List<EventDTO> result = new ArrayList<>();
+
+        String datePattern = "[0-9]{2}.[0-9]{2}.[0-9]{4}(г\\.)?( \\([а-яА-Я]+\\))?";
+        String timePattern = "[0-9]{2}.[0-9]{2}-[0-9]{2}.[0-9]{2}";
+
+        String dateTime = "";
+        String subject = "";
+
+        if (values == null || values.isEmpty()) {
+            System.out.println("No data found.");
+        } else {
+            for (List<Object> row : values) {
+                if (row.size() < 2) {
+                    continue;
+                }
+
+                if (row.get(0).toString().matches(datePattern)) {
+                    dateTime = row.get(0).toString().replaceFirst("(г\\.)?( \\([а-яА-Я]+\\))?", "") + " " + row.get(1).toString(); // очистим дату от лишних символов
+                    if (row.size() > 2) {
+                        subject = row.get(2).toString();
+                    }
+
+                    if(!dateTime.isEmpty() && !subject.isEmpty()) {
+                        result.add(new EventDTO(dateTime, subject, "Преподаватель"));
+                        dateTime = "";
+                        subject = "";
+                    }
+                }
+            }
+        }
+        return result;
     }
+
 }
-
-
