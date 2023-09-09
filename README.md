@@ -2,7 +2,15 @@
 
 ## Program Description
 
-This Java application, built with Spring, automates the process of fetching class schedule data from Google Sheets, processing it, and adding it to Google Calendar. The program is controlled via a Telegram bot.
+This application streamlines the management of university class schedules by integrating Google Sheets and Google Calendar through a user-friendly Telegram bot interface. It offers the following key features:
+
+- Data Retrieval: The program fetches class schedule data from Google Sheets, ensuring the most up-to-date information is available.
+- Data Processing: After retrieving the data, the application processes and structures it for easy management.
+- Google Calendar Integration: It allows you to add class events directly to Google Calendar, keeping track of important dates and times.
+- Telegram Bot Interface: Interaction with the application is made simple and convenient through a Telegram bot, providing a chat-based interface for users to retrieve schedules and manage calendar events effortlessly.
+
+By automating these tasks, the application saves time, reduces scheduling errors, and enhances the overall experience for both students and administrators.
+
 
 ## Features
 
@@ -41,7 +49,8 @@ This Java application, built with Spring, automates the process of fetching clas
 
 ## Example Bot Commands
 
-![img.png](readme/img.png)
+![bot-buttons-screen.jpg](img%2Fbot-buttons-screen.jpg)
+![swagger-screen.jpg](img%2Fswagger-screen.jpg)
 
 ## Author
 

@@ -1,6 +1,7 @@
 package org.gaavr.controller;
 
 import com.google.api.services.calendar.model.Event;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.gaavr.model.EventDTO;
 import org.gaavr.service.GoogleCalendarService;
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/calendar")
 @RequiredArgsConstructor
+@Api(value = "Google Calendar Controller", tags = { "Google Calendar" })
 public class GoogleCalendarController {
 
     private final GoogleCalendarService googleCalendarService;
@@ -22,7 +24,7 @@ public class GoogleCalendarController {
         return googleCalendarService.getEvents();
     }
 
-    @PostMapping("/events")
+    @PostMapping("/create-event")
     public Event createEvent(@RequestBody Event event) {
         return googleCalendarService.createEvent(event);
     }
@@ -41,7 +43,6 @@ public class GoogleCalendarController {
         } catch (GeneralSecurityException | IOException | InterruptedException e) {
             return e.getMessage();
         }
-
 
     }
 
