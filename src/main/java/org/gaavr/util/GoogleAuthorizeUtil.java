@@ -42,7 +42,7 @@ public class GoogleAuthorizeUtil {
     public Credential authorize() throws IOException, GeneralSecurityException {
         InputStream in = GoogleAuthorizeUtil.class.getResourceAsStream(googleConfig.getCredentialsPath());
         if (in == null) {
-            throw new NullPointerException("credentials.json not found");
+            throw new NullPointerException("google-sheet-credentials.json not found");
         }
 
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));

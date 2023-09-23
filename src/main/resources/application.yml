@@ -1,9 +1,15 @@
 google:
   spreadsheet:
-    id: 1x4eIUP9KHrvk8v2EwhADoeMxH-CyLc312l5PoI8dcqI
+    id: your_value
+    mainList: your_value
   credentials:
     path: /credentials/google-sheet-credentials.json
   application:
-    name: fromtabletocalendar
+    name: your_value
   calendar:
-    id: 72e01db5c10ce861a42aca28ac25824eaa5f76f5a59cd8886f3ce3b5aca66631@group.calendar.google.com
+    id: your_value
+telegram:
+  name: your_value
+  token: your_value
+  ownerChat:
+    id: your_value
